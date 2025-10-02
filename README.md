@@ -18,7 +18,7 @@ Test automation framework for Player Controller API using Java 17, TestNG, and R
 ```
 players-api/
 ├── src/main/
-│   ├── java/ua/tymo/
+│   ├── java/spribe/task/
 │   │   ├── api/
 │   │   │   ├── core/           # Core framework classes
 │   │   │   ├── model/          # Data models
@@ -34,10 +34,10 @@ players-api/
 ├── src/test/
 │   ├── java/
 │   │   ├── base/               # Base test class
-│   │   └── ua/tymo/tests/      # Test classes
+│   │   └── spribe/task/tests/  # Test classes
 │   └── resources/
 │       ├── suites/             # TestNG suites
-│       └── schemas/            # JSON schemas
+│       └── allure/             # Allure categories
 └── pom.xml
 ```
 
@@ -63,8 +63,8 @@ editor.admin=admin
 
 # API Endpoints (configurable per environment)
 endpoint.player.create=/player/create/{editor}
-endpoint.player.get=/player/get
-endpoint.player.getAll=/player/get/all
+endpoint.player.get.by.id=/player/get
+endpoint.player.get.all=/player/get/all
 endpoint.player.update=/player/update/{editor}/{id}
 endpoint.player.delete=/player/delete/{editor}
 
@@ -197,35 +197,6 @@ Test: Get player by id returns correct data
 - ✅ `PATCH /player/update/{editor}/{id}` - Update player
 - ✅ `DELETE /player/delete/{editor}` - Delete player
 
-### Test Categories (63 tests total)
-- **Positive Tests** (20+) - Happy path scenarios including boundary values
-- **Negative Tests** (30+) - Validation, error handling, required fields
-- **Authorization Tests** (10+) - Role-based access control for all roles
-- **Concurrency Tests** (1) - Parallel execution scenarios
-- **E2E Tests** (1) - Full lifecycle integration test
-
-### Coverage by Requirements
-- ✅ **Age validation** (16-60) - 4 tests (min, max, boundaries)
-- ✅ **Password validation** (7-15 chars, latin+numbers) - 6 tests
-- ✅ **Unique fields** (login, screenName) - 2 tests
-- ✅ **Gender validation** (male/female) - 1 test
-- ✅ **Role validation** (admin/user only) - 2 tests
-- ✅ **Required fields** - 6 tests (all fields)
-- ✅ **Supervisor permissions** - 5 tests (full coverage)
-- ✅ **Admin permissions** - 8 tests (full coverage)
-- ✅ **User permissions** - 7 tests (full coverage including restrictions)
-
-### Test Classes (8 classes, 63 tests total)
-- `CreatePlayerTests` (27 tests) - Player creation, validation, required fields, boundaries
-- `GetPlayerTests` (4 tests) - Get player by ID scenarios
-- `GetPlayersTests` (1 test) - Get all players with schema validation
-- `UpdatePlayerTests` (12 tests) - Player update scenarios and permissions
-- `DeletePlayerTests` (11 tests) - Player deletion scenarios and role permissions
-- `AuthAndRolesTests` (2 tests) - Authorization and role restrictions
-- `AdminEditorTests` (3 tests) - Admin-specific operations
-- `ConcurrencyTests` (1 test) - Concurrent operations
-- `PlayerControllerE2ETest` (1 test) - Full lifecycle end-to-end scenario
-
 ## Key Features
 
 ### ✅ Configuration Management
@@ -254,12 +225,12 @@ Test: Get player by id returns correct data
 ### ✅ Allure Reporting
 - **Detailed Steps** - Every action and assertion as separate step
 - **Automatic Attachments** - Request/response bodies, error details, metrics
-- **Smart Assertions** - `AllureAssertions` helper with @Step annotations
 - **Categories** - Automatic error classification (6 categories)
 - **Environment Info** - Detailed test environment configuration
 - **Response Metrics** - Status codes, response times, content types
 - **Pretty JSON** - Formatted request/response bodies
 - **Trends & Timeline** - Historical data and parallel execution visualization
+- **Soft Assertions** - TestNG SoftAssert for comprehensive field validation
 
 ### ✅ Clean Code Practices
 - Service layer pattern
@@ -315,7 +286,7 @@ allure includeProperties: false, jdk: '', results: [[path: 'target/allure-result
 
 ## Author
 
-Anatolii Tymo
+QA Automation Framework
 
 ## License
 
