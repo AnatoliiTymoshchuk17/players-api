@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Player API Suite" parallel="methods" thread-count="3">
+
+    <listeners>
+        <listener class-name="support.listeners.AllureEnvironmentListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="Players">
+        <packages>
+            <package name="tests.players"/>
+        </packages>
+    </test>
+</suite>
