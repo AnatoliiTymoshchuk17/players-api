@@ -1,6 +1,6 @@
 package base;
 
-import ua.tymo.api.core.RequestSpecFactory;
+import spribe.task.api.core.RequestSpecFactory;
 import io.restassured.specification.RequestSpecification;
 import org.testng.annotations.BeforeClass;
 

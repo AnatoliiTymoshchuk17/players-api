@@ -3,13 +3,13 @@
 <suite name="Player API Suite" parallel="methods" thread-count="3">
 
     <listeners>
-        <listener class-name="ua.tymo.support.listeners.AllureEnvironmentListener"/>
+        <listener class-name="spribe.task.support.listeners.AllureEnvironmentListener"/>
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
     <test name="Players">
         <packages>
-            <package name="ua.tymo.tests.players"/>
+            <package name="spribe.task.tests.players"/>
         </packages>
     </test>
 </suite>
