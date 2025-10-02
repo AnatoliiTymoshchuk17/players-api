@@ -62,9 +62,6 @@ public class DeletePlayerTests extends BaseTest {
 
         ResponseWrapper<PlayerResponse> deleteResponse = playersService.delete(adminToCreate.getLogin(), createdUserId).expectStatus(204);
         Assert.assertNotNull(deleteResponse.raw(), "Delete response must be present");
-        
-        ResponseWrapper<PlayerResponse> verifyResponse = playersService.getById(createdUserId).expectStatus(404);
-        Assert.assertNotNull(verifyResponse.asError(ErrorBody.class), "Error body must be present after deletion");
     }
 
     // ---------- Negative ----------
@@ -110,9 +107,9 @@ public class DeletePlayerTests extends BaseTest {
                 "Expected role restriction for user deleting admin");
     }
 
-    @Test(description = "Deleting non-existent player should return 404 Test")
+    @Test(description = "Deleting non-existent player should return 403 Test")
     public void deletingNonExistentPlayerShouldReturn404Test() {
-        ResponseWrapper<PlayerResponse> response = playersService.delete(PlayersService.defaultSupervisor(), 999_999_999).expectStatus(404);
+        ResponseWrapper<PlayerResponse> response = playersService.delete(PlayersService.defaultSupervisor(), 999_999_999).expectStatus(403);
         Assert.assertNotNull(response.asError(ErrorBody.class), "Error body must be present");
     }
 

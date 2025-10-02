@@ -18,7 +18,7 @@ public class GetPlayersTests extends BaseTest {
 
     @Test(description = "Get all players returns 200 and matches schema Test")
     public void getAllPlayersReturns200AndMatchesSchemaTest() {
-        
+
         ResponseWrapper<PlayersResponse> getAllResponse =
                 playersService.getAll().expectStatus(200);
 
@@ -27,7 +27,6 @@ public class GetPlayersTests extends BaseTest {
                 .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/players-schema.json"));
 
         PlayersResponse body = getAllResponse.asBody();
-        
         Assert.assertNotNull(body, "PlayersResponse body must not be null");
     }
 }

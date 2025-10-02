@@ -71,7 +71,6 @@ public final class ResponseWrapper<T> {
             log.info("Deserializing response body to {}", type.getSimpleName());
             T result = M.readValue(body, type);
             
-            // Attach pretty-printed JSON to Allure
             try {
                 String prettyJson = M.writerWithDefaultPrettyPrinter().writeValueAsString(result);
                 Allure.addAttachment("Response Body (" + type.getSimpleName() + ")", "application/json", prettyJson);
@@ -120,7 +119,7 @@ public final class ResponseWrapper<T> {
             Allure.addAttachment("Raw Error Response", body);
             Assert.fail("Failed to deserialize error to " + errorType.getSimpleName() +
                     ". Raw: " + body, e);
-            return null; // unreachable
+            return null;
         }
     }
 

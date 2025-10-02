@@ -354,7 +354,7 @@ public class CreatePlayerTests extends BaseTest {
     public void createWithPassword7CharsShouldSucceedTest() {
         
         Player playerWithBoundaryPassword = TestDataGenerator.generateValidPlayer(Role.USER.getValue());
-        playerWithBoundaryPassword.setPassword("Pass123"); // exactly 7 chars
+        playerWithBoundaryPassword.setPassword("Pass123");
 
         ResponseWrapper<PlayerResponse> createResponse =
                 playersService.create(PlayersService.defaultSupervisor(), playerWithBoundaryPassword)
@@ -370,7 +370,7 @@ public class CreatePlayerTests extends BaseTest {
     public void createWithPassword15CharsShouldSucceedTest() {
         
         Player playerWithBoundaryPassword = TestDataGenerator.generateValidPlayer(Role.USER.getValue());
-        playerWithBoundaryPassword.setPassword("Password1234567"); // exactly 15 chars
+        playerWithBoundaryPassword.setPassword("Password1234567");
 
         ResponseWrapper<PlayerResponse> createResponse =
                 playersService.create(PlayersService.defaultSupervisor(), playerWithBoundaryPassword)
@@ -413,5 +413,4 @@ public class CreatePlayerTests extends BaseTest {
         Assert.assertTrue(createResponse.asError(ErrorBody.class).getTitle().toLowerCase().contains("only those with role"),
                 "Expected role restriction for user creating another user");
     }
-
 }

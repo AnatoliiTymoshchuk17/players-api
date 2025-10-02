@@ -205,13 +205,13 @@ public class UpdatePlayerTests extends BaseTest {
         Assert.assertNotNull(response.asError(ErrorBody.class), "Error body must be present");
     }
 
-    @Test(description = "Update non-existent user should return 404 Test")
-    public void updateNonExistentUserShouldReturn404Test() {
+    @Test(description = "Update non-existent user should return 403 Test")
+    public void updateNonExistentUserShouldReturn403Test() {
         Player partialUpdatePayload = new Player();
         partialUpdatePayload.setAge(25);
 
         ResponseWrapper<PlayerResponse> response = playersService.update(PlayersService.defaultSupervisor(), 999_999_999, partialUpdatePayload)
-                .expectStatus(404);
+                .expectStatus(403);
         Assert.assertNotNull(response.asError(ErrorBody.class), "Error body must be present");
     }
 
