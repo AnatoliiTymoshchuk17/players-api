@@ -1,0 +1,37 @@
+Issues:
+
+Critical – Validation Bugs (23):
+API accepts password shorter than 7 characters or longer than 15
+API accepts password without numbers or letters
+API does not return the password field in the response after creation
+API accepts age < 16 and age > 60, but rejects valid age = 16
+API accepts duplicate login and screenName
+API accepts invalid gender on CREATE and UPDATE
+API creates a user without the required password field
+API returns empty body when trying to create with role=supervisor or with an invalid role
+API returns 400 instead of 403 when an admin tries to create a supervisor
+API does NOT return the role field when creating user or admin accounts
+A user can create other users (should be forbidden, returns empty body)
+API does not return the age field after creating a user with age=60
+
+Critical – Access Rights Bugs (11):
+A user can delete themselves (should return 403, receives 204)
+A user can delete an admin (should return 403, receives 204)
+An admin can delete themselves (should return 403, receives 204)
+A non-existent editor can delete users (should return 403, receives 204)
+A user can update other users’ data (should return 403, receives 200)
+A user can update admin data (should return 403, receives 200)
+A user cannot update their own profile (should return 200, receives 403)
+API accepts invalid password on UPDATE (should return 400, receives 200)
+API accepts age=15 on UPDATE (should return 400/403, receives 200)
+
+High:
+A supervisor cannot update user’s age, login, or screenName (old values remain)
+A supervisor cannot update multiple fields at once (old values remain)
+Sometimes after DELETE the user is still available via GET
+
+Medium:
+GET non-existent user returns 200 instead of 404
+GET with null ID returns 200 instead of 400
+UPDATE non-existent user returns 200
+API does not return age field after creating with age=60
