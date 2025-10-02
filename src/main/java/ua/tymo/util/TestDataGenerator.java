@@ -3,6 +3,8 @@ package ua.tymo.util;
 import ua.tymo.api.model.enums.Gender;
 import ua.tymo.api.model.enums.Role;
 import ua.tymo.api.model.request.Player;
+import ua.tymo.common.env.ConfigFactoryProvider;
+import ua.tymo.common.env.TestConfig;
 import net.datafaker.Faker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +12,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Generates test data for Player entities.
+ * Uses TestConfig for validation rules (age, password length, etc.)
+ */
 public final class TestDataGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(TestDataGenerator.class);
     private static final Faker faker = new Faker(new Locale("en"));
+    private static final TestConfig config = ConfigFactoryProvider.config();
 
     private TestDataGenerator() {}
 
@@ -95,56 +102,6 @@ public final class TestDataGenerator {
     public static Player generatePlayerWithDuplicateScreenName(String existingScreenName) {
         Player player = generateValidPlayer();
         player.setScreenName(existingScreenName);
-        return player;
-    }
-
-    public static Player generatePlayerWithNullFields() {
-        Player player = new Player();
-        player.setAge(25);
-        player.setGender(Gender.MALE.getValue());
-        return player;
-    }
-
-    public static Player generatePlayerWithMissingAge() {
-        Player player = generateValidPlayer();
-        player.setAge(null);
-        return player;
-    }
-
-    public static Player generatePlayerWithMissingGender() {
-        Player player = generateValidPlayer();
-        player.setGender(null);
-        return player;
-    }
-
-    public static Player generatePlayerWithMissingLogin() {
-        Player player = generateValidPlayer();
-        player.setLogin(null);
-        return player;
-    }
-
-    public static Player generatePlayerWithMissingPassword() {
-        Player player = generateValidPlayer();
-        player.setPassword(null);
-        return player;
-    }
-
-    public static Player generatePlayerWithMissingRole() {
-        Player player = generateValidPlayer();
-        player.setRole(null);
-        return player;
-    }
-
-    public static Player generatePlayerWithMissingScreenName() {
-        Player player = generateValidPlayer();
-        player.setScreenName(null);
-        return player;
-    }
-
-    public static Player generatePartialUpdatePlayer() {
-        Player player = new Player();
-        player.setAge(randomAge());
-        player.setGender(randomGender());
         return player;
     }
 
@@ -230,23 +187,8 @@ public final class TestDataGenerator {
 
     // ---------- CONFIG READERS ----------
 
-    private static int minAge()      { return intProp("test.user.min.age", 16); }
-    private static int maxAge()      { return intProp("test.user.max.age", 60); }
-    private static int minPwdLen()   { return intProp("test.password.min.length", 7); }
-    private static int maxPwdLen()   { return intProp("test.password.max.length", 15); }
-
-    private static int intProp(String key, int def) {
-        String val = System.getProperty(key);
-        if (val == null || val.isEmpty()) {
-            String envKey = key.replace('.', '_').toUpperCase(Locale.ROOT);
-            val = System.getenv(envKey);
-        }
-        if (val == null || val.isEmpty()) return def;
-        try {
-            return Integer.parseInt(val.trim());
-        } catch (NumberFormatException e) {
-            log.warn("Invalid int for {}='{}' -> using default {}", key, val, def);
-            return def;
-        }
-    }
+    private static int minAge()      { return config.minAge(); }
+    private static int maxAge()      { return config.maxAge(); }
+    private static int minPwdLen()   { return config.minPasswordLength(); }
+    private static int maxPwdLen()   { return config.maxPasswordLength(); }
 }

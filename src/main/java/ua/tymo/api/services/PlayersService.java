@@ -2,10 +2,11 @@ package ua.tymo.api.services;
 
 import ua.tymo.api.core.RequestSpecFactory;
 import ua.tymo.api.core.ResponseWrapper;
-import ua.tymo.api.model.enums.Role;
 import ua.tymo.api.model.request.Player;
 import ua.tymo.api.model.response.PlayerResponse;
 import ua.tymo.api.model.response.PlayersResponse;
+import ua.tymo.common.env.ConfigFactoryProvider;
+import ua.tymo.common.env.TestConfig;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
@@ -16,24 +17,11 @@ import static io.restassured.RestAssured.given;
 
 /**
  * Service-layer around player-controller endpoints.
- *  - create: GET /player/create/{editor} with query params
- *  - get by id: POST /player/get  with body { "playerId": id }
- *  - get all: GET /player/get/all
- *  - update: PATCH /player/update/{editor}/{id}
- *  - delete: DELETE /player/delete/{editor} with body { "playerId": id }
+ * Endpoints are configurable via TestConfig for different environments.
  */
 public class PlayersService {
 
-    private enum Route {
-        CREATE("/player/create/{editor}"),
-        GET_BY_ID("/player/get"),
-        GET_ALL("/player/get/all"),
-        UPDATE("/player/update/{editor}/{id}"),
-        DELETE("/player/delete/{editor}");
-
-        final String path;
-        Route(String path) { this.path = path; }
-    }
+    private final TestConfig config = ConfigFactoryProvider.config();
 
     @Step("Create player as {editor}")
     public ResponseWrapper<PlayerResponse> create(String editor, Player payload) {
@@ -49,7 +37,7 @@ public class PlayersService {
                 .spec(RequestSpecFactory.defaultSpec())
                 .pathParam("editor", editor)
                 .queryParams(query)
-                .get(Route.CREATE.path);
+                .get(config.endpointPlayerCreate());
 
         return new ResponseWrapper<>(resp, PlayerResponse.class);
     }
@@ -62,7 +50,7 @@ public class PlayersService {
         Response resp = given()
                 .spec(RequestSpecFactory.defaultSpec())
                 .body(body)
-                .post(Route.GET_BY_ID.path);
+                .post(config.endpointPlayerGet());
 
         return new ResponseWrapper<>(resp, PlayerResponse.class);
     }
@@ -71,7 +59,7 @@ public class PlayersService {
     public ResponseWrapper<PlayersResponse> getAll() {
         Response resp = given()
                 .spec(RequestSpecFactory.defaultSpec())
-                .get(Route.GET_ALL.path);
+                .get(config.endpointPlayerGetAll());
 
         return new ResponseWrapper<>(resp, PlayersResponse.class);
     }
@@ -83,7 +71,7 @@ public class PlayersService {
                 .pathParam("editor", editor)
                 .pathParam("id", id)
                 .body(update)
-                .patch(Route.UPDATE.path);
+                .patch(config.endpointPlayerUpdate());
 
         return new ResponseWrapper<>(resp, PlayerResponse.class);
     }
@@ -97,25 +85,22 @@ public class PlayersService {
                 .spec(RequestSpecFactory.defaultSpec())
                 .pathParam("editor", editor)
                 .body(body)
-                .delete(Route.DELETE.path);
+                .delete(config.endpointPlayerDelete());
 
         return new ResponseWrapper<>(resp, PlayerResponse.class);
     }
 
-    /** Helpers to read default editors from sys/env (fallbacks provided) */
+    /**
+     * Helper to get default supervisor login from configuration.
+     */
     public static String defaultSupervisor() {
-        String sys = System.getProperty("editor.supervisor");
-        if (sys != null && !sys.isBlank()) return sys;
-        String env = System.getenv("EDITOR_SUPERVISOR");
-        if (env != null && !env.isBlank()) return env;
-        return Role.SUPERVISOR.getValue();
+        return ConfigFactoryProvider.config().supervisorLogin();
     }
 
+    /**
+     * Helper to get default admin login from configuration.
+     */
     public static String defaultAdmin() {
-        String sys = System.getProperty("editor.admin");
-        if (sys != null && !sys.isBlank()) return sys;
-        String env = System.getenv("EDITOR_ADMIN");
-        if (env != null && !env.isBlank()) return env;
-        return Role.ADMIN.getValue();
+        return ConfigFactoryProvider.config().adminLogin();
     }
 }

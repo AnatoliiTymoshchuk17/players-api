@@ -7,19 +7,22 @@ import ua.tymo.api.model.request.Player;
 import ua.tymo.api.model.response.PlayerResponse;
 import ua.tymo.api.services.PlayersService;
 import base.BaseTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ua.tymo.util.TestDataGenerator;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class UpdatePlayerTests extends BaseTest {
 
+    private static final Logger log = LoggerFactory.getLogger(UpdatePlayerTests.class);
     private final PlayersService playersService = new PlayersService();
-    private final List<Integer> createdPlayerIdsForCleanup = new ArrayList<>();
+    private final List<Integer> createdPlayerIdsForCleanup = new CopyOnWriteArrayList<>();
 
     private int createdUserId;
 
@@ -36,7 +39,8 @@ public class UpdatePlayerTests extends BaseTest {
         for (Integer createdPlayerId : createdPlayerIdsForCleanup) {
             try {
                 playersService.delete(PlayersService.defaultSupervisor(), createdPlayerId).raw();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                log.warn("Failed to cleanup player with id={}: {}", createdPlayerId, e.getMessage());
             }
         }
         createdPlayerIdsForCleanup.clear();
@@ -210,10 +214,86 @@ public class UpdatePlayerTests extends BaseTest {
 
     @Test(description = "Update with non-existent editor should return 403 Test")
     public void updateWithNonExistentEditorShouldReturn403Test() {
+        log.info("Starting test: Update with non-existent editor should return 403");
         Player partialUpdatePayload = new Player();
         partialUpdatePayload.setAge(25);
 
         playersService.update("non_existent_editor_login", createdUserId, partialUpdatePayload)
                 .expectStatus(403);
+        log.info("Test completed: Non-existent editor correctly rejected");
+    }
+
+    @Test(description = "User cannot update other users Test")
+    public void userCannotUpdateOtherUsersTest() {
+        log.info("Starting test: User cannot update other users");
+        
+        // Create first user
+        Player firstUserToCreate = TestDataGenerator.generateValidPlayer(Role.USER.getValue());
+        log.info("Creating first user with login: {}", firstUserToCreate.getLogin());
+        int firstUserId = playersService.create(PlayersService.defaultSupervisor(), firstUserToCreate)
+                .expectStatus(200).asBody().getPlayerId();
+        createdPlayerIdsForCleanup.add(firstUserId);
+        
+        // Create second user (the target)
+        Player secondUserToCreate = TestDataGenerator.generateValidPlayer(Role.USER.getValue());
+        log.info("Creating second user with login: {}", secondUserToCreate.getLogin());
+        int secondUserId = playersService.create(PlayersService.defaultSupervisor(), secondUserToCreate)
+                .expectStatus(200).asBody().getPlayerId();
+        createdPlayerIdsForCleanup.add(secondUserId);
+
+        // First user tries to update second user
+        Player updatePayload = new Player();
+        updatePayload.setAge(50);
+        
+        log.info("First user attempting to update second user");
+        ResponseWrapper<PlayerResponse> updateResponse =
+                playersService.update(firstUserToCreate.getLogin(), secondUserId, updatePayload)
+                        .expectStatus(403);
+
+        ErrorBody error = updateResponse.asError(ErrorBody.class);
+        log.info("Received error: {}", error.getTitle());
+        Assert.assertTrue(error.getTitle().toLowerCase().contains("forbidden")
+                        || error.getTitle().toLowerCase().contains("not allowed")
+                        || error.getTitle().toLowerCase().contains("only"),
+                "Expected permission restriction, got: " + error.getTitle());
+        
+        log.info("Test completed: User correctly forbidden from updating other users");
+    }
+
+    @Test(description = "User cannot update admin Test")
+    public void userCannotUpdateAdminTest() {
+        log.info("Starting test: User cannot update admin");
+        
+        // Create admin
+        Player adminToCreate = TestDataGenerator.generateValidPlayer(Role.ADMIN.getValue());
+        log.info("Creating admin with login: {}", adminToCreate.getLogin());
+        int adminId = playersService.create(PlayersService.defaultSupervisor(), adminToCreate)
+                .expectStatus(200).asBody().getPlayerId();
+        createdPlayerIdsForCleanup.add(adminId);
+        
+        // Create user
+        Player userToCreate = TestDataGenerator.generateValidPlayer(Role.USER.getValue());
+        log.info("Creating user with login: {}", userToCreate.getLogin());
+        int userId = playersService.create(PlayersService.defaultSupervisor(), userToCreate)
+                .expectStatus(200).asBody().getPlayerId();
+        createdPlayerIdsForCleanup.add(userId);
+
+        // User tries to update admin
+        Player updatePayload = new Player();
+        updatePayload.setAge(55);
+        
+        log.info("User attempting to update admin");
+        ResponseWrapper<PlayerResponse> updateResponse =
+                playersService.update(userToCreate.getLogin(), adminId, updatePayload)
+                        .expectStatus(403);
+
+        ErrorBody error = updateResponse.asError(ErrorBody.class);
+        log.info("Received error: {}", error.getTitle());
+        Assert.assertTrue(error.getTitle().toLowerCase().contains("forbidden")
+                        || error.getTitle().toLowerCase().contains("not allowed")
+                        || error.getTitle().toLowerCase().contains("only"),
+                "Expected role restriction for user updating admin, got: " + error.getTitle());
+        
+        log.info("Test completed: User correctly forbidden from updating admin");
     }
 }

@@ -2,16 +2,19 @@ package ua.tymo.util;
 
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
+import ua.tymo.common.env.ConfigFactoryProvider;
 
-
+/**
+ * TestNG retry analyzer that retries failed tests based on configuration.
+ * Retry count is configured via TestConfig.
+ */
 public class RetryAnalyzer implements IRetryAnalyzer {
 
     private int attempt = 0;
     private final int maxAttempts;
 
     public RetryAnalyzer() {
-        this.maxAttempts = Integer.parseInt(System.getProperty("test.retry.count",
-                System.getenv().getOrDefault("TEST_RETRY_COUNT", "1")));
+        this.maxAttempts = ConfigFactoryProvider.config().retryCount();
     }
 
     @Override

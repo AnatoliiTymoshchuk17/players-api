@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Product defects",
+    "description": "Bugs in application functionality",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*AssertionError.*"
+  },
+  {
+    "name": "Test defects",
+    "description": "Issues with test code",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(NullPointerException|IllegalArgumentException|IllegalStateException).*"
+  },
+  {
+    "name": "Connection issues",
+    "description": "Network or connection problems",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(ConnectException|SocketTimeoutException|UnknownHostException).*"
+  },
+  {
+    "name": "Timeout issues",
+    "description": "Tests that timed out",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*TimeoutException.*"
+  },
+  {
+    "name": "Deserialization issues",
+    "description": "Problems parsing response",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(JsonProcessingException|Failed to deserialize).*"
+  },
+  {
+    "name": "HTTP Status Mismatch",
+    "description": "Unexpected HTTP status codes",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Unexpected HTTP status.*"
+  }
+]
+

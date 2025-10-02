@@ -7,26 +7,31 @@ import ua.tymo.api.model.request.Player;
 import ua.tymo.api.model.response.PlayerResponse;
 import ua.tymo.api.services.PlayersService;
 import base.BaseTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import ua.tymo.util.TestDataGenerator;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class AuthAndRolesTests extends BaseTest {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthAndRolesTests.class);
     private final PlayersService playersService = new PlayersService();
-    private final List<Integer> createdPlayerIdsForCleanup = new ArrayList<>();
+    private final List<Integer> createdPlayerIdsForCleanup = new CopyOnWriteArrayList<>();
 
     @AfterMethod(alwaysRun = true)
     public void cleanup() {
         for (Integer id : createdPlayerIdsForCleanup) {
             try {
                 playersService.delete(PlayersService.defaultSupervisor(), id).raw();
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                log.warn("Failed to cleanup player with id={}: {}", id, e.getMessage());
+            }
         }
         createdPlayerIdsForCleanup.clear();
     }

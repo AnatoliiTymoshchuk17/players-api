@@ -3,13 +3,14 @@
 <suite name="Player API Suite" parallel="methods" thread-count="3">
 
     <listeners>
-        <listener class-name="support.listeners.AllureEnvironmentListener"/>
+        <listener class-name="ua.tymo.support.listeners.AllureEnvironmentListener"/>
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
     <test name="Players">
         <packages>
-            <package name="tests.players"/>
+            <package name="ua.tymo.tests.players"/>
         </packages>
     </test>
 </suite>
+
